@@ -20,7 +20,7 @@ export default function ClusterTabs({ clusters, active, onChange }: Props) {
           className={`text-xs uppercase tracking-widest px-2 py-1 border transition-colors ${
             active === null
               ? "border-accent text-accent"
-              : "border-ink-300 dark:border-ink-700 text-ink-500 hover:text-ink-900 dark:hover:text-ink-100"
+              : "border-ink-300 dark:border-ink-700 text-ink-600 dark:text-ink-300 hover:text-ink-900 dark:hover:text-ink-50"
           }`}
         >
           All
@@ -33,10 +33,10 @@ export default function ClusterTabs({ clusters, active, onChange }: Props) {
             className={`cluster-chip text-xs uppercase tracking-widest px-2 py-1 border transition-colors ${
               active === c.label
                 ? "border-accent text-accent"
-                : "border-ink-300 dark:border-ink-700 text-ink-500 hover:text-ink-900 dark:hover:text-ink-100"
+                : "border-ink-300 dark:border-ink-700 text-ink-600 dark:text-ink-300 hover:text-ink-900 dark:hover:text-ink-50"
             }`}
           >
-            {c.label} <span className="text-ink-500 font-mono ml-1">{c.count}</span>
+            {c.label} <span className="text-ink-500 dark:text-ink-400 font-mono ml-1">{c.count}</span>
           </button>
         ))}
       </div>

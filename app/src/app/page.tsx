@@ -1,7 +1,10 @@
 import Link from "next/link";
 import SearchBox from "@/components/SearchBox";
+import { getBrand } from "@/lib/brand";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const brand = await getBrand();
+
   return (
     <main className="min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 py-20">
@@ -9,13 +12,13 @@ export default function HomePage() {
           <header className="mb-10 text-center">
             <Link href="/" className="inline-block group">
               <h1 className="font-serif text-5xl tracking-tight text-ink-900 dark:text-ink-100 mb-2">
-                buffy <span className="italic text-accent">search</span>
+                {brand.prefix} <span className="italic text-accent">{brand.italic}</span>
               </h1>
             </Link>
-            <p className="font-serif italic text-ink-700 dark:text-ink-300 text-lg leading-relaxed">
+            <p className="font-serif italic text-ink-700 dark:text-ink-200 text-lg leading-relaxed">
               A small, self-hosted search engine.
               <br />
-              <span className="text-ink-500 not-italic text-sm tracking-wide">
+              <span className="text-ink-500 dark:text-ink-400 not-italic text-sm tracking-wide">
                 custom ranking · optional self-hosted AI · no third parties
               </span>
             </p>
@@ -25,7 +28,7 @@ export default function HomePage() {
             <SearchBox autoFocus size="lg" />
           </div>
 
-          <ul className="text-xs font-mono text-ink-500 flex flex-wrap gap-x-4 gap-y-1 justify-center">
+          <ul className="text-xs font-mono text-ink-500 dark:text-ink-400 flex flex-wrap gap-x-4 gap-y-1 justify-center">
             <li>
               <span className="text-accent">·</span> bm25 + engine consensus + trust + recency
             </li>
@@ -36,14 +39,14 @@ export default function HomePage() {
               <span className="text-accent">·</span> tf-idf topic clusters
             </li>
             <li>
-              <span className="text-accent">·</span> gpt-oss-120b on tap
+              <span className="text-accent">·</span> self-hosted ai
             </li>
           </ul>
         </div>
       </div>
 
-      <footer className="px-6 py-4 border-t border-ink-200 dark:border-ink-700/50 text-center font-mono text-[10px] uppercase tracking-widest text-ink-500">
-        searxng → custom rank → optional vllm · no telemetry · no ads
+      <footer className="px-6 py-4 border-t border-ink-200 dark:border-ink-800 text-center font-mono text-[10px] uppercase tracking-widest text-ink-500 dark:text-ink-400">
+        searxng → custom rank → optional self-hosted ai · no telemetry · no ads
       </footer>
     </main>
   );

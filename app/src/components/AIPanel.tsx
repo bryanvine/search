@@ -137,12 +137,12 @@ export default function AIPanel({ query, results }: Props) {
           <h3 className="text-xs uppercase tracking-widest text-accent font-sans">
             AI synthesis
           </h3>
-          <span className="text-[10px] uppercase tracking-wider text-ink-500 font-sans">
-            self-hosted · gpt-oss-120b
+          <span className="text-[10px] uppercase tracking-wider text-ink-500 dark:text-ink-400 font-sans">
+            self-hosted · grounded in sources
           </span>
         </div>
         {!done && !error && (
-          <span className="text-[10px] uppercase tracking-wider text-ink-500 font-sans">
+          <span className="text-[10px] uppercase tracking-wider text-ink-500 dark:text-ink-400 font-sans">
             streaming…
           </span>
         )}
@@ -153,7 +153,7 @@ export default function AIPanel({ query, results }: Props) {
             Couldn't reach the AI backend: {error}
           </p>
         ) : !text ? (
-          <p className="text-ink-500 italic">Reading {top.length} sources…</p>
+          <p className="text-ink-600 dark:text-ink-300 italic">Reading {top.length} sources…</p>
         ) : (
           <div className={done ? "" : "streaming-cursor"}>
             {renderWithCitations(text, citations)}
@@ -161,7 +161,7 @@ export default function AIPanel({ query, results }: Props) {
         )}
       </div>
       {top.length > 0 && (
-        <footer className="px-5 pb-3 pt-1 border-t border-accent/20 text-[11px] font-mono text-ink-500 leading-relaxed">
+        <footer className="px-5 pb-3 pt-1 border-t border-accent/20 text-[11px] font-mono text-ink-600 dark:text-ink-300 leading-relaxed">
           {top.map((r, i) => (
             <span key={r.url} className="mr-2">
               <span className="text-accent">[{i + 1}]</span>{" "}

@@ -9,7 +9,7 @@ interface Props {
 export default function ResultsList({ results, showDebug }: Props) {
   if (!results.length) {
     return (
-      <p className="font-serif italic text-ink-500 py-8">
+      <p className="font-serif italic text-ink-500 dark:text-ink-400 py-8">
         No results — try a different query.
       </p>
     );

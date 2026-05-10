@@ -67,10 +67,10 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
       <div className="animate-pulse space-y-4 mt-8" aria-label="Searching">
         {[...Array(5)].map((_, i) => (
           <div key={i} className="space-y-2">
-            <div className="h-3 w-1/3 bg-ink-200 dark:bg-ink-700/50" />
-            <div className="h-5 w-2/3 bg-ink-200 dark:bg-ink-700/50" />
-            <div className="h-3 w-full bg-ink-200 dark:bg-ink-700/50" />
-            <div className="h-3 w-5/6 bg-ink-200 dark:bg-ink-700/50" />
+            <div className="h-3 w-1/3 bg-ink-200 dark:bg-ink-800" />
+            <div className="h-5 w-2/3 bg-ink-200 dark:bg-ink-800" />
+            <div className="h-3 w-full bg-ink-200 dark:bg-ink-800" />
+            <div className="h-3 w-5/6 bg-ink-200 dark:bg-ink-800" />
           </div>
         ))}
       </div>
@@ -82,9 +82,9 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-10">
       <div>
-        <div className="flex items-center justify-between mb-4 pb-2 border-b border-ink-200 dark:border-ink-700/50">
-          <p className="text-xs font-mono text-ink-500">
-            <span className="text-ink-700 dark:text-ink-300">{data.results.length}</span>{" "}
+        <div className="flex items-center justify-between mb-4 pb-2 border-b border-ink-200 dark:border-ink-800">
+          <p className="text-xs font-mono text-ink-600 dark:text-ink-300">
+            <span className="text-ink-900 dark:text-ink-50">{data.results.length}</span>{" "}
             results · <span className="uppercase tracking-wider">{data.intent}</span>{" "}
             · <span>{data.tookMs}ms</span>
             {data.cached && <span className="text-accent"> · cached</span>}
@@ -110,18 +110,18 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
           <Infobox infobox={data.infoboxes[0]} />
         )}
         {data.answers.length > 0 && (
-          <div className="border border-ink-300 dark:border-ink-700 p-5 mb-6 bg-white/40 dark:bg-ink-900/40">
-            <h3 className="font-serif text-sm uppercase tracking-widest text-ink-500 mb-2">
+          <div className="border border-ink-300 dark:border-ink-700 p-5 mb-6 bg-white/40 dark:bg-ink-800/30">
+            <h3 className="font-serif text-sm uppercase tracking-widest text-ink-600 dark:text-ink-300 mb-2">
               Direct answer
             </h3>
-            <p className="font-serif text-sm leading-relaxed">
+            <p className="font-serif text-sm leading-relaxed text-ink-900 dark:text-ink-100">
               {data.answers[0]}
             </p>
           </div>
         )}
         {data.suggestions.length > 0 && (
           <div className="mb-6">
-            <h3 className="font-serif text-xs uppercase tracking-widest text-ink-500 mb-2">
+            <h3 className="font-serif text-xs uppercase tracking-widest text-ink-600 dark:text-ink-300 mb-2">
               Related
             </h3>
             <ul className="text-sm space-y-1">
@@ -129,7 +129,7 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
                 <li key={s}>
                   <a
                     href={`/search?q=${encodeURIComponent(s)}`}
-                    className="font-serif italic text-ink-700 dark:text-ink-300 hover:text-accent transition-colors"
+                    className="font-serif italic text-ink-700 dark:text-ink-200 hover:text-accent transition-colors"
                   >
                     {s}
                   </a>
@@ -138,12 +138,12 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
             </ul>
           </div>
         )}
-        <div className="text-[10px] font-mono text-ink-500 leading-relaxed">
-          <p className="mb-1 uppercase tracking-widest">engines</p>
+        <div className="text-[10px] font-mono text-ink-600 dark:text-ink-300 leading-relaxed">
+          <p className="mb-1 uppercase tracking-widest text-ink-500 dark:text-ink-400">engines</p>
           <p className="break-words">{enginesUsedDisplay || "—"}</p>
           {data.unresponsiveEngines.length > 0 && (
             <>
-              <p className="mt-3 mb-1 uppercase tracking-widest text-red-700/70">slow / down</p>
+              <p className="mt-3 mb-1 uppercase tracking-widest text-red-700 dark:text-red-400">slow / down</p>
               <p className="break-words">{data.unresponsiveEngines.join(" · ")}</p>
             </>
           )}

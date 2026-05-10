@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
-  darkMode: "class",
+  darkMode: "media",
   theme: {
     extend: {
       fontFamily: {
@@ -16,13 +16,16 @@ const config: Config = {
           100: "#f4f3ee",
           200: "#e9e7dd",
           300: "#d6d3c5",
+          400: "#a8a48f",
           500: "#7b7868",
+          600: "#54524a",
           700: "#3a3830",
+          800: "#26241f",
           900: "#1a1915",
         },
         accent: {
-          DEFAULT: "#c2410c",
-          dark: "#9a3412",
+          DEFAULT: "var(--accent, #c2410c)",
+          dark: "var(--accent-dark, #9a3412)",
         },
       },
       typography: {

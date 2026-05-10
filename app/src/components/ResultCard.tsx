@@ -20,24 +20,24 @@ export default function ResultCard({ result, rank, showDebug }: Props) {
   const age = formatAge(result.ageDays);
 
   return (
-    <article className="group py-5 border-b border-ink-200 dark:border-ink-700/50 last:border-b-0">
+    <article className="group py-5 border-b border-ink-200 dark:border-ink-800 last:border-b-0">
       <div className="flex items-baseline gap-3 mb-1.5">
-        <span className="font-mono text-xs text-ink-500 tabular-nums w-6 shrink-0">
+        <span className="font-mono text-xs text-ink-500 dark:text-ink-400 tabular-nums w-6 shrink-0">
           {rank.toString().padStart(2, "0")}
         </span>
         <a
           href={result.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-ink-500 text-xs font-mono truncate hover:text-accent transition-colors"
+          className="text-ink-600 dark:text-ink-300 text-xs font-mono truncate hover:text-accent transition-colors"
         >
           {result.domain}
         </a>
         {age && (
-          <span className="text-xs text-ink-500 font-sans tracking-wide">· {age}</span>
+          <span className="text-xs text-ink-500 dark:text-ink-400 font-sans tracking-wide">· {age}</span>
         )}
         {result.cluster && (
-          <span className="cluster-chip ml-auto text-[10px] uppercase tracking-widest text-accent/80 border border-accent/30 px-1.5 py-0.5">
+          <span className="cluster-chip ml-auto text-[10px] uppercase tracking-widest text-accent/90 border border-accent/40 px-1.5 py-0.5">
             {result.cluster}
           </span>
         )}
@@ -47,18 +47,18 @@ export default function ResultCard({ result, rank, showDebug }: Props) {
           href={result.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-ink-900 dark:text-ink-100 hover:text-accent transition-colors decoration-ink-300 hover:decoration-accent underline-offset-4"
+          className="text-ink-900 dark:text-ink-50 hover:text-accent transition-colors decoration-ink-300 hover:decoration-accent underline-offset-4"
         >
           {result.title || result.url}
         </a>
       </h2>
       {result.content && (
-        <p className="font-serif text-[15px] leading-relaxed text-ink-700 dark:text-ink-300 line-clamp-3">
+        <p className="font-serif text-[15px] leading-relaxed text-ink-700 dark:text-ink-200 line-clamp-3">
           {result.content}
         </p>
       )}
       {showDebug && result.debug && (
-        <pre className="mt-2 text-[10px] font-mono text-ink-500 leading-tight whitespace-pre-wrap">
+        <pre className="mt-2 text-[10px] font-mono text-ink-500 dark:text-ink-400 leading-tight whitespace-pre-wrap">
 {`final=${result.debug.final.toFixed(3)}  bm25=${result.debug.bm25.toFixed(2)}  consensus=${result.debug.consensus.toFixed(2)}  trust=${result.debug.trust.toFixed(2)}  recency=${result.debug.recency.toFixed(2)}  engines=${result.debug.enginesCount}  mmr_pen=${result.debug.mmrPenalty.toFixed(3)}`}
         </pre>
       )}

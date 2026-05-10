@@ -32,7 +32,7 @@ export default function SearchBox({ initialQuery = "", autoFocus = false, size =
       onSubmit={submit}
       className={`group relative flex items-stretch w-full ${
         isLg ? "max-w-2xl" : "max-w-3xl"
-      } border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 transition-shadow focus-within:shadow-md`}
+      } border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 transition-shadow focus-within:shadow-md focus-within:border-accent/60`}
     >
       <input
         ref={ref}
@@ -43,14 +43,14 @@ export default function SearchBox({ initialQuery = "", autoFocus = false, size =
         placeholder={isLg ? "Ask anything." : "Search…"}
         autoComplete="off"
         spellCheck={false}
-        className={`flex-1 bg-transparent outline-none placeholder:text-ink-500 ${
+        className={`flex-1 bg-transparent outline-none text-ink-900 dark:text-ink-50 caret-accent ${
           isLg ? "px-6 py-5 text-2xl font-serif" : "px-4 py-3 text-base font-serif"
         }`}
       />
       <button
         type="submit"
         aria-label="Search"
-        className={`flex items-center justify-center px-5 text-ink-700 dark:text-ink-100 hover:text-accent transition-colors ${
+        className={`flex items-center justify-center px-5 text-ink-700 dark:text-ink-200 hover:text-accent transition-colors ${
           isLg ? "text-xl" : ""
         }`}
       >

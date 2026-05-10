@@ -1,25 +1,26 @@
 import type { Metadata, Viewport } from "next";
+import { getBrand } from "@/lib/brand";
 import "./globals.css";
 
-const PUBLIC_URL = process.env.PUBLIC_BASE_URL ?? "https://search.buffy.bot";
-
-export const metadata: Metadata = {
-  metadataBase: new URL(PUBLIC_URL),
-  title: {
-    default: "buffy search — privacy-respecting meta-search",
-    template: "%s — buffy search",
-  },
-  description:
-    "Self-hosted meta-search with a custom ranking pipeline. Optional self-hosted AI answers — no third-party AI.",
-  applicationName: "buffy search",
-  robots: { index: false, follow: false },
-  openGraph: {
-    type: "website",
-    title: "buffy search",
-    description: "Self-hosted meta-search with a custom ranking pipeline.",
-    url: PUBLIC_URL,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getBrand();
+  return {
+    metadataBase: new URL(brand.publicUrl),
+    title: {
+      default: `${brand.fullName} — privacy-respecting meta-search`,
+      template: `%s — ${brand.fullName}`,
+    },
+    description: brand.description,
+    applicationName: brand.fullName,
+    robots: { index: false, follow: false },
+    openGraph: {
+      type: "website",
+      title: brand.fullName,
+      description: brand.description,
+      url: brand.publicUrl,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -30,9 +31,10 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const brand = await getBrand();
   return (
-    <html lang="en">
+    <html lang="en" data-brand={brand.id}>
       <body className="font-serif antialiased">{children}</body>
     </html>
   );

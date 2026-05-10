@@ -4,6 +4,13 @@
 
 :root {
   color-scheme: light dark;
+  --accent: #c2410c;
+  --accent-dark: #9a3412;
+}
+
+[data-brand="vineai"] {
+  --accent: #15803d;
+  --accent-dark: #166534;
 }
 
 html,
@@ -27,14 +34,17 @@ body {
 }
 
 ::selection {
-  background-color: #c2410c;
+  background-color: var(--accent);
   color: #fff;
 }
 
-/* Subtle search input focus ring */
-.ring-accent:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(194, 65, 12, 0.4);
+input::placeholder {
+  color: #54524a;
+}
+@media (prefers-color-scheme: dark) {
+  input::placeholder {
+    color: #a8a48f;
+  }
 }
 
 /* Pulse-while-streaming */
@@ -46,7 +56,7 @@ body {
   content: "▌";
   margin-left: 2px;
   animation: streamPulse 1s ease-in-out infinite;
-  color: #c2410c;
+  color: var(--accent);
 }
 
 /* Topic chip */
