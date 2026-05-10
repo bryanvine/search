@@ -1,7 +1,7 @@
 use_default_settings: true
 
 general:
-  instance_name: "buffy-search"
+  instance_name: "search"
   donation_url: false
   contact_url: false
   enable_metrics: true
@@ -17,7 +17,7 @@ search:
 server:
   port: 8080
   bind_address: "0.0.0.0"
-  secret_key: "${SEARXNG_SECRET:-buffy-search-change-me-in-production}"
+  secret_key: "${SEARXNG_SECRET:-change-me-in-production}"
   base_url: false
   image_proxy: false
   http_protocol_version: "1.1"

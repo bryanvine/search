@@ -29,7 +29,7 @@ export async function searxngSearch(opts: SearxngQueryOpts): Promise<SearxngResp
     method: "GET",
     headers: {
       Accept: "application/json",
-      "User-Agent": "buffy-search/0.1 (+https://search.buffy.bot)",
+      "User-Agent": "self-hosted-search/0.1",
       // SearXNG's bot detection wants these set when run behind a proxy
       "X-Forwarded-For": "127.0.0.1",
       "X-Real-IP": "127.0.0.1",

@@ -5,8 +5,11 @@
  * pipeline that's easy to inspect.
  */
 
-const VLLM_BASE_URL = process.env.VLLM_BASE_URL ?? "http://mtkt-controller:8100/v1";
-const VLLM_MODEL = process.env.VLLM_MODEL ?? "openai/gpt-oss-120b";
+// Set VLLM_BASE_URL and VLLM_MODEL in your .env. The endpoint must be
+// OpenAI-compatible (vLLM, llama.cpp server, Ollama with --openai-compat,
+// LMStudio, etc.). VLLM_MODEL is the model name your endpoint serves.
+const VLLM_BASE_URL = process.env.VLLM_BASE_URL ?? "http://localhost:8100/v1";
+const VLLM_MODEL = process.env.VLLM_MODEL ?? "your-model";
 
 interface ChatMessage {
   role: "system" | "user" | "assistant";

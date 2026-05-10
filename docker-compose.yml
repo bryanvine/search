@@ -11,16 +11,20 @@ services:
       - NODE_ENV=production
       - SEARXNG_URL=http://searxng:8080
       - REDIS_URL=redis://redis:6379
-      - VLLM_BASE_URL=http://mtkt-controller:8100/v1
-      - VLLM_MODEL=openai/gpt-oss-120b
-      - PUBLIC_BASE_URL=https://search.buffy.bot
+      - VLLM_BASE_URL=${VLLM_BASE_URL:-http://localhost:8100/v1}
+      - VLLM_MODEL=${VLLM_MODEL:-your-model}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost:20000}
     depends_on:
       searxng:
         condition: service_started
       redis:
         condition: service_healthy
+    # When the vLLM hostname isn't routable from inside the container (e.g. it
+    # lives on a Tailscale/VPN network), set VLLM_HOSTNAME and VLLM_HOST_IP in
+    # your .env so docker-compose maps it. Defaults below resolve to the
+    # docker host so this is a no-op for local-only setups.
     extra_hosts:
-      - "mtkt-controller:100.103.196.93"
+      - "${VLLM_HOSTNAME:-vllm.local}:${VLLM_HOST_IP:-host-gateway}"
     networks:
       - search-net
     restart: unless-stopped
@@ -37,7 +41,7 @@ services:
       - "20080:8080"
     environment:
       - SEARXNG_BASE_URL=http://searxng:8080/
-      - INSTANCE_NAME=buffy-search
+      - INSTANCE_NAME=${SEARXNG_INSTANCE_NAME:-search}
     volumes:
       - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
     networks:

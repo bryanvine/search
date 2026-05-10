@@ -1,4 +1,4 @@
-/* buffy-search service worker */
+/* service worker — cache app shell, network-first for navigations */
 const VERSION = "v1";
 const SHELL_CACHE = `shell-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
