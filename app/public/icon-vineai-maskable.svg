@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="VineAI Search">
+  <rect width="512" height="512" fill="#1a1915"/>
+  <text x="256" y="334"
+        font-family="ui-serif, Georgia, 'Times New Roman', serif"
+        font-size="260" font-weight="700" font-style="italic"
+        text-anchor="middle" fill="#15803d"
+        letter-spacing="-6">V</text>
+  <path d="M 332 184 q 26 -6 44 18 q -22 22 -42 12 q -1 -16 -2 -30 z"
+        fill="#15803d"/>
+</svg>

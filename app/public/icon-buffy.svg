@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="buffy.bot search">
+  <rect width="512" height="512" fill="#1a1915"/>
+  <text x="256" y="378"
+        font-family="ui-serif, Georgia, 'Times New Roman', serif"
+        font-size="380" font-weight="700" font-style="italic"
+        text-anchor="middle" fill="#c2410c"
+        letter-spacing="-12">b</text>
+  <circle cx="376" cy="146" r="28" fill="#c2410c"/>
+</svg>

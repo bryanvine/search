@@ -24,6 +24,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "kern", "liga", "calt", "ss01";
+  /* iOS: prevent rubber-band overscroll showing the wrong color, allow safe areas */
+  overscroll-behavior-y: contain;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Disable iOS double-tap-to-zoom delay; better tap responsiveness */
+* { touch-action: manipulation; }
+
+/* Avoid iOS auto-zoom on focus when input font-size < 16px */
+input, textarea, select {
+  font-size: 16px;
 }
 
 @media (prefers-color-scheme: dark) {

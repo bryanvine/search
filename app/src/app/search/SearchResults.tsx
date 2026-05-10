@@ -80,7 +80,7 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
   const enginesUsedDisplay = data.enginesUsed.slice(0, 8).join(" · ");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-10">
+    <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6 md:gap-10">
       <div>
         <div className="flex items-center justify-between mb-4 pb-2 border-b border-ink-200 dark:border-ink-800">
           <p className="text-xs font-mono text-ink-600 dark:text-ink-300">

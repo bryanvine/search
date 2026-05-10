@@ -24,12 +24,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
   const brand = await getBrand();
 
   return (
-    <main className="min-h-screen flex flex-col">
-      <header className="border-b border-ink-200 dark:border-ink-800 px-6 py-3">
-        <div className="max-w-6xl mx-auto flex items-center gap-6">
+    <main className="min-h-[100svh] flex flex-col">
+      <header className="border-b border-ink-200 dark:border-ink-800 px-4 sm:px-6 py-3 sticky top-0 bg-ink-50/90 dark:bg-ink-900/90 backdrop-blur z-10" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
           <Link
             href="/"
-            className="font-serif text-xl tracking-tight whitespace-nowrap shrink-0 text-ink-900 dark:text-ink-100"
+            className="font-serif text-lg sm:text-xl tracking-tight whitespace-nowrap shrink-0 text-ink-900 dark:text-ink-100 leading-none"
           >
             {brand.prefix} <span className="italic text-accent">{brand.italic}</span>
           </Link>
@@ -39,7 +39,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
         </div>
       </header>
 
-      <div className="flex-1 px-6 py-6">
+      <div className="flex-1 px-4 sm:px-6 py-5 sm:py-6">
         <div className="max-w-6xl mx-auto">
           {q ? (
             <Suspense fallback={<LoadingSkeleton />}>
@@ -54,7 +54,10 @@ export default async function SearchPage({ searchParams }: PageProps) {
       </div>
 
       {brand.credit && (
-        <footer className="px-6 py-3 border-t border-ink-200 dark:border-ink-800 text-center font-mono text-[10px] uppercase tracking-widest text-ink-500 dark:text-ink-400">
+        <footer
+          className="px-4 sm:px-6 py-3 border-t border-ink-200 dark:border-ink-800 text-center font-mono text-[10px] uppercase tracking-widest text-ink-500 dark:text-ink-400"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
           Created by{" "}
           <a
             href={brand.credit.url}

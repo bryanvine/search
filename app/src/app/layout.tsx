@@ -1,9 +1,18 @@
 import type { Metadata, Viewport } from "next";
+import ServiceWorker from "@/components/ServiceWorker";
 import { getBrand } from "@/lib/brand";
 import "./globals.css";
 
+const ACCENTS: Record<string, string> = {
+  buffy: "#c2410c",
+  vineai: "#15803d",
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const brand = await getBrand();
+  const accent = ACCENTS[brand.id] ?? "#c2410c";
+  const iconBase = `/icon-${brand.id}`;
+
   return {
     metadataBase: new URL(brand.publicUrl),
     title: {
@@ -13,6 +22,20 @@ export async function generateMetadata(): Promise<Metadata> {
     description: brand.description,
     applicationName: brand.fullName,
     robots: { index: false, follow: false },
+    manifest: "/manifest.webmanifest",
+    icons: {
+      icon: [{ url: `${iconBase}.svg`, type: "image/svg+xml" }],
+      apple: [{ url: `${iconBase}.svg`, sizes: "192x192", type: "image/svg+xml" }],
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: brand.fullName,
+    },
+    other: {
+      "mobile-web-app-capable": "yes",
+      "msapplication-TileColor": accent,
+    },
     openGraph: {
       type: "website",
       title: brand.fullName,
@@ -25,17 +48,24 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fafaf7" },
     { media: "(prefers-color-scheme: dark)", color: "#11110e" },
   ],
+  colorScheme: "light dark",
+  userScalable: true,
+  maximumScale: 5,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const brand = await getBrand();
   return (
     <html lang="en" data-brand={brand.id}>
-      <body className="font-serif antialiased">{children}</body>
+      <body className="font-serif antialiased">
+        {children}
+        <ServiceWorker />
+      </body>
     </html>
   );
 }
