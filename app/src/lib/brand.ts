@@ -2,6 +2,11 @@ import { headers } from "next/headers";
 
 export type BrandId = "buffy" | "vineai";
 
+export interface BrandCredit {
+  name: string;
+  url: string;
+}
+
 export interface Brand {
   id: BrandId;
   prefix: string;
@@ -9,6 +14,7 @@ export interface Brand {
   fullName: string;
   publicUrl: string;
   description: string;
+  credit?: BrandCredit;
 }
 
 const BRANDS: Record<BrandId, Brand> = {
@@ -23,12 +29,16 @@ const BRANDS: Record<BrandId, Brand> = {
   },
   vineai: {
     id: "vineai",
-    prefix: "vineai.tech",
-    italic: "search",
-    fullName: "vineai.tech search",
+    prefix: "VineAI",
+    italic: "Search",
+    fullName: "VineAI Search",
     publicUrl: "https://search.vineai.tech",
     description:
       "Self-hosted meta-search with a custom ranking pipeline. Optional self-hosted AI answers — no third-party AI.",
+    credit: {
+      name: "Bryan Vine",
+      url: "https://linkedin.com/in/bryanvine/",
+    },
   },
 };
 

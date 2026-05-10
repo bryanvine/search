@@ -52,6 +52,20 @@ export default async function SearchPage({ searchParams }: PageProps) {
           )}
         </div>
       </div>
+
+      {brand.credit && (
+        <footer className="px-6 py-3 border-t border-ink-200 dark:border-ink-800 text-center font-mono text-[10px] uppercase tracking-widest text-ink-500 dark:text-ink-400">
+          Created by{" "}
+          <a
+            href={brand.credit.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline underline-offset-4"
+          >
+            {brand.credit.name}
+          </a>
+        </footer>
+      )}
     </main>
   );
 }

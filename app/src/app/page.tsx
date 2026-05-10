@@ -45,8 +45,21 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <footer className="px-6 py-4 border-t border-ink-200 dark:border-ink-800 text-center font-mono text-[10px] uppercase tracking-widest text-ink-500 dark:text-ink-400">
-        searxng → custom rank → optional self-hosted ai · no telemetry · no ads
+      <footer className="px-6 py-4 border-t border-ink-200 dark:border-ink-800 text-center font-mono text-[10px] uppercase tracking-widest text-ink-500 dark:text-ink-400 space-y-1">
+        {brand.credit && (
+          <p>
+            Created by{" "}
+            <a
+              href={brand.credit.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent hover:underline underline-offset-4"
+            >
+              {brand.credit.name}
+            </a>
+          </p>
+        )}
+        <p>searxng → custom rank → optional self-hosted ai · no telemetry · no ads</p>
       </footer>
     </main>
   );
