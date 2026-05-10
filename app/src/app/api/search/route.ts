@@ -54,13 +54,18 @@ export async function GET(req: NextRequest) {
     )
   ).sort();
 
+  // Normalize SearXNG answers (which may be objects) to plain strings.
+  const answersNormalized = (searxResp.answers ?? [])
+    .map((a) => (typeof a === "string" ? a : a?.answer ?? ""))
+    .filter((s): s is string => typeof s === "string" && s.length > 0);
+
   const payload: SearchPayload = {
     query: q,
     intent,
     results,
     clusters,
     infoboxes: searxResp.infoboxes ?? [],
-    answers: searxResp.answers ?? [],
+    answers: answersNormalized,
     suggestions: searxResp.suggestions ?? [],
     enginesUsed,
     unresponsiveEngines: (searxResp.unresponsive_engines ?? []).map((e) => (Array.isArray(e) ? e[0] : String(e))),

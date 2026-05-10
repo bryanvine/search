@@ -11,11 +11,27 @@ export interface SearxngResult {
   thumbnail?: string | null;
 }
 
+/**
+ * SearXNG answers come in two shapes:
+ *  - Plain strings (some plugins)
+ *  - Objects of shape `{url, engine, parsed_url, template, answer}` where the
+ *    user-readable text lives in `.answer` (most plugins, e.g. currency, calc)
+ */
+export type SearxngRawAnswer =
+  | string
+  | {
+      answer?: string;
+      url?: string;
+      engine?: string;
+      parsed_url?: unknown;
+      template?: string;
+    };
+
 export interface SearxngResponse {
   query: string;
   number_of_results: number;
   results: SearxngResult[];
-  answers?: string[];
+  answers?: SearxngRawAnswer[];
   corrections?: string[];
   infoboxes?: Array<{
     infobox?: string;
