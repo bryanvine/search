@@ -1,0 +1,105 @@
+use_default_settings: true
+
+general:
+  instance_name: "buffy-search"
+  donation_url: false
+  contact_url: false
+  enable_metrics: true
+
+search:
+  safe_search: 0
+  autocomplete: "duckduckgo"
+  default_lang: "en"
+  formats:
+    - html
+    - json
+
+server:
+  port: 8080
+  bind_address: "0.0.0.0"
+  secret_key: "${SEARXNG_SECRET:-buffy-search-change-me-in-production}"
+  base_url: false
+  image_proxy: false
+  http_protocol_version: "1.1"
+  method: "GET"
+  default_http_headers:
+    X-Content-Type-Options: nosniff
+    X-Download-Options: noopen
+    X-Robots-Tag: noindex, nofollow
+    Referrer-Policy: no-referrer
+  limiter: false
+  public_instance: false
+
+ui:
+  static_use_hash: true
+  default_theme: simple
+  theme_args:
+    simple_style: dark
+  search_on_category_select: true
+  hotkeys: default
+
+outgoing:
+  request_timeout: 6.0
+  max_request_timeout: 12.0
+  pool_connections: 100
+  pool_maxsize: 20
+  enable_http2: true
+
+# Engines - tuned for general web + knowledge + dev queries.
+# Most engines are inherited from default settings; we only override
+# specific ones that need tweaks (timeouts, disabled state).
+engines:
+  - name: google
+    timeout: 6.0
+
+  - name: bing
+    timeout: 6.0
+
+  - name: duckduckgo
+    timeout: 6.0
+
+  - name: brave
+    timeout: 6.0
+
+  - name: startpage
+    timeout: 6.0
+
+  - name: qwant
+    timeout: 6.0
+
+  - name: wikipedia
+    timeout: 4.0
+
+  - name: wikidata
+    timeout: 4.0
+
+  - name: github
+    timeout: 6.0
+
+  - name: stackoverflow
+    timeout: 6.0
+
+  - name: reddit
+    timeout: 6.0
+
+  - name: hackernews
+    timeout: 6.0
+
+  - name: arxiv
+    timeout: 8.0
+
+  - name: youtube
+    disabled: false
+    timeout: 6.0
+
+  - name: bing news
+    timeout: 6.0
+
+  - name: google news
+    timeout: 6.0
+
+doi_resolvers:
+  oadoi.org: 'https://oadoi.org/'
+  doi.org: 'https://doi.org/'
+
+default_doi_resolver: 'oadoi.org'

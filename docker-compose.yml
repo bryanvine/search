@@ -1,0 +1,79 @@
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: search-app
+    ports:
+      - "20000:20000"
+    environment:
+      - PORT=20000
+      - NODE_ENV=production
+      - SEARXNG_URL=http://searxng:8080
+      - REDIS_URL=redis://redis:6379
+      - VLLM_BASE_URL=http://mtkt-controller:8100/v1
+      - VLLM_MODEL=openai/gpt-oss-120b
+      - PUBLIC_BASE_URL=https://search.buffy.bot
+    depends_on:
+      searxng:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    extra_hosts:
+      - "mtkt-controller:100.103.196.93"
+    networks:
+      - search-net
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: search-searxng
+    ports:
+      - "20080:8080"
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080/
+      - INSTANCE_NAME=buffy-search
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+    networks:
+      - search-net
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: search-redis
+    ports:
+      - "20379:6379"
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - search-net
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+volumes:
+  redis-data:
+
+networks:
+  search-net:
+    driver: bridge

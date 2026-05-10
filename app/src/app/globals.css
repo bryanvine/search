@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #fafaf7;
+  color: #1a1915;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern", "liga", "calt", "ss01";
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #11110e;
+    color: #f4f3ee;
+  }
+}
+
+::selection {
+  background-color: #c2410c;
+  color: #fff;
+}
+
+/* Subtle search input focus ring */
+.ring-accent:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(194, 65, 12, 0.4);
+}
+
+/* Pulse-while-streaming */
+@keyframes streamPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.streaming-cursor::after {
+  content: "▌";
+  margin-left: 2px;
+  animation: streamPulse 1s ease-in-out infinite;
+  color: #c2410c;
+}
+
+/* Topic chip */
+.cluster-chip {
+  font-variant-numeric: tabular-nums;
+}
