@@ -102,7 +102,12 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
           <AIPanel query={query} results={data.results.slice(0, 8)} />
         )}
 
-        <ResultsList results={filtered} showDebug={debug} />
+        <ResultsList
+          results={filtered}
+          showDebug={debug}
+          unresponsiveEngines={data.unresponsiveEngines}
+          enginesUsedCount={data.enginesUsed.length}
+        />
       </div>
 
       <aside className="hidden md:block">

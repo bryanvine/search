@@ -45,56 +45,64 @@ outgoing:
   pool_maxsize: 20
   enable_http2: true
 
-# Engines - tuned for general web + knowledge + dev queries.
-# Most engines are inherited from default settings; we only override
-# specific ones that need tweaks (timeouts, disabled state).
+# Engines — kept diverse so when scraper-hostile engines (Google, Bing,
+# Brave, DuckDuckGo, Startpage) rate-limit our IP, the alternative engines
+# below keep results flowing. Most engines are inherited from defaults;
+# we only override timeouts and explicit enable/disable.
 engines:
+  # Mainstream web — aggressive about blocking scrapers
   - name: google
     timeout: 6.0
-
   - name: bing
     timeout: 6.0
-
   - name: duckduckgo
     timeout: 6.0
-
   - name: brave
     timeout: 6.0
-
   - name: startpage
     timeout: 6.0
 
+  # Smaller / less scraper-hostile general engines (often still up when the
+  # majors are rate-limiting us)
   - name: qwant
     timeout: 6.0
-
-  - name: wikipedia
-    timeout: 4.0
-
-  - name: wikidata
-    timeout: 4.0
-
-  - name: github
+  - name: mojeek
+    disabled: false
     timeout: 6.0
-
-  - name: stackoverflow
+  - name: mwmbl
+    disabled: false
     timeout: 6.0
-
-  - name: reddit
+  - name: presearch
+    disabled: false
     timeout: 6.0
-
-  - name: hackernews
-    timeout: 6.0
-
-  - name: arxiv
-    timeout: 8.0
-
-  - name: youtube
+  - name: yep
     disabled: false
     timeout: 6.0
 
+  # Knowledge — almost always responsive
+  - name: wikipedia
+    timeout: 4.0
+  - name: wikidata
+    timeout: 4.0
+
+  # Dev / community
+  - name: github
+    timeout: 6.0
+  - name: stackoverflow
+    timeout: 6.0
+  - name: reddit
+    timeout: 6.0
+  - name: hackernews
+    timeout: 6.0
+  - name: arxiv
+    timeout: 8.0
+
+  # Media + news
+  - name: youtube
+    disabled: false
+    timeout: 6.0
   - name: bing news
     timeout: 6.0
-
   - name: google news
     timeout: 6.0
 
