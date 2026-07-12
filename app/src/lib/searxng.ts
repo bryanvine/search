@@ -2,6 +2,10 @@ import type { SearxngResponse } from "./types";
 
 const SEARXNG_URL = process.env.SEARXNG_URL ?? "http://searxng:8080";
 
+// SearXNG aggregates many engines; a healthy response is a few seconds. Past
+// this we're better off failing fast than holding the request open.
+const SEARCH_TIMEOUT_MS = 15_000;
+
 export interface SearxngQueryOpts {
   query: string;
   pageno?: number;
@@ -11,6 +15,7 @@ export interface SearxngQueryOpts {
   timeRange?: "" | "day" | "week" | "month" | "year";
   safesearch?: 0 | 1 | 2;
   signal?: AbortSignal;
+  timeoutMs?: number;
 }
 
 export async function searxngSearch(opts: SearxngQueryOpts): Promise<SearxngResponse> {
@@ -24,6 +29,9 @@ export async function searxngSearch(opts: SearxngQueryOpts): Promise<SearxngResp
   if (opts.categories?.length) params.set("categories", opts.categories.join(","));
   if (opts.engines?.length) params.set("engines", opts.engines.join(","));
 
+  const signals = [AbortSignal.timeout(opts.timeoutMs ?? SEARCH_TIMEOUT_MS)];
+  if (opts.signal) signals.push(opts.signal);
+
   const url = `${SEARXNG_URL}/search?${params.toString()}`;
   const res = await fetch(url, {
     method: "GET",
@@ -34,7 +42,7 @@ export async function searxngSearch(opts: SearxngQueryOpts): Promise<SearxngResp
       "X-Forwarded-For": "127.0.0.1",
       "X-Real-IP": "127.0.0.1",
     },
-    signal: opts.signal,
+    signal: AbortSignal.any(signals),
     cache: "no-store",
   });
 

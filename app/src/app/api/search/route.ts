@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
       pageno: 1,
       language: "en",
       timeRange: intent === "news" ? "month" : "",
+      signal: req.signal,
     });
   } catch (err) {
     return NextResponse.json(

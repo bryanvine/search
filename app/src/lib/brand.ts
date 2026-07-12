@@ -14,6 +14,7 @@ export interface Brand {
   fullName: string;
   publicUrl: string;
   description: string;
+  accent: string;
   credit?: BrandCredit;
 }
 
@@ -26,6 +27,7 @@ const BRANDS: Record<BrandId, Brand> = {
     publicUrl: "https://search.buffy.bot",
     description:
       "Self-hosted meta-search with a custom ranking pipeline. Optional self-hosted AI answers — no third-party AI.",
+    accent: "#c2410c",
   },
   vineai: {
     id: "vineai",
@@ -35,6 +37,7 @@ const BRANDS: Record<BrandId, Brand> = {
     publicUrl: "https://search.vineai.tech",
     description:
       "Self-hosted meta-search with a custom ranking pipeline. Optional self-hosted AI answers — no third-party AI.",
+    accent: "#15803d",
     credit: {
       name: "Bryan Vine",
       url: "https://linkedin.com/in/bryanvine/",

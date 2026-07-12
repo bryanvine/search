@@ -7,10 +7,65 @@ export const dynamic = "force-dynamic";
 
 const MAX_SOURCES = 8;
 const MAX_SNIPPET_CHARS = 600;
+const MAX_QUERY_CHARS = 500;
+const MAX_TITLE_CHARS = 200;
+const MAX_URL_CHARS = 300;
+const MAX_BODY_BYTES = 64 * 1024;
+
+// Per-IP fixed-window rate limit. In-memory is enough: this app runs as a
+// single container, and the limit only has to keep the vLLM box from being
+// farmed — the UI fires one request per search.
+const RATE_LIMIT = 20;
+const RATE_WINDOW_MS = 60_000;
+const rateMap = new Map<string, { count: number; windowStart: number }>();
 
 interface AnswerBody {
   query: string;
   results: Array<Pick<RankedResult, "url" | "title" | "content" | "domain">>;
+}
+
+function clientIp(req: NextRequest): string {
+  return (
+    req.headers.get("cf-connecting-ip") ??
+    req.headers.get("x-real-ip") ??
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+    "unknown"
+  );
+}
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateMap.get(ip);
+  if (!entry || now - entry.windowStart >= RATE_WINDOW_MS) {
+    if (rateMap.size > 1000) {
+      for (const [k, v] of rateMap) {
+        if (now - v.windowStart >= RATE_WINDOW_MS) rateMap.delete(k);
+      }
+    }
+    rateMap.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT;
+}
+
+/**
+ * Reject browser requests from other origins. Non-browser clients (curl etc.)
+ * send neither header and pass through — the rate limit covers those.
+ */
+function isCrossOrigin(req: NextRequest): boolean {
+  const site = req.headers.get("sec-fetch-site");
+  if (site && site !== "same-origin" && site !== "none") return true;
+  const origin = req.headers.get("origin");
+  if (origin) {
+    const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
+    try {
+      if (new URL(origin).host !== host) return true;
+    } catch {
+      return true;
+    }
+  }
+  return false;
 }
 
 function buildSystemPrompt(): string {
@@ -44,6 +99,14 @@ function buildUserPrompt(query: string, sources: AnswerBody["results"]): string 
 }
 
 export async function POST(req: NextRequest) {
+  if (isCrossOrigin(req)) return new Response("forbidden", { status: 403 });
+  if (rateLimited(clientIp(req))) return new Response("rate limited", { status: 429 });
+
+  const contentLength = Number(req.headers.get("content-length") ?? "0");
+  if (contentLength > MAX_BODY_BYTES) {
+    return new Response("payload too large", { status: 413 });
+  }
+
   let body: AnswerBody;
   try {
     body = (await req.json()) as AnswerBody;
@@ -51,8 +114,15 @@ export async function POST(req: NextRequest) {
     return new Response("invalid json", { status: 400 });
   }
 
-  const query = (body.query ?? "").trim();
-  const results = Array.isArray(body.results) ? body.results : [];
+  const query = (typeof body.query === "string" ? body.query : "").trim().slice(0, MAX_QUERY_CHARS);
+  const results = (Array.isArray(body.results) ? body.results : [])
+    .slice(0, MAX_SOURCES)
+    .map((r) => ({
+      url: String(r?.url ?? "").slice(0, MAX_URL_CHARS),
+      title: String(r?.title ?? "").slice(0, MAX_TITLE_CHARS),
+      content: String(r?.content ?? "").slice(0, MAX_SNIPPET_CHARS),
+      domain: String(r?.domain ?? "").slice(0, 100),
+    }));
 
   if (!query) return new Response("missing query", { status: 400 });
   if (!results.length) return new Response("missing results", { status: 400 });
@@ -76,9 +146,11 @@ export async function POST(req: NextRequest) {
         }
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
       } catch (err) {
-        const msg = (err as Error).message ?? "vllm error";
+        // Log the real error server-side; the client gets a generic message
+        // so backend details never leave the box.
+        console.error("[answer] generation failed:", (err as Error).message);
         controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({ error: msg })}\n\n`)
+          encoder.encode(`data: ${JSON.stringify({ error: "unavailable or timed out" })}\n\n`)
         );
       } finally {
         controller.close();

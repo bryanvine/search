@@ -1,5 +1,5 @@
 /* service worker — cache app shell, network-first for navigations */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL_CACHE = `shell-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 
@@ -47,14 +47,18 @@ self.addEventListener("fetch", (event) => {
       (async () => {
         try {
           const fresh = await fetch(req);
-          // Best-effort cache the navigation response for next time
-          const cache = await caches.open(RUNTIME_CACHE);
-          cache.put(req, fresh.clone()).catch(() => {});
+          // Only cache the home page — /search?q=... URLs are unique per
+          // query, so caching them grows the cache without bound and the
+          // entries only ever match their exact URL offline.
+          if (url.pathname === "/") {
+            const cache = await caches.open(RUNTIME_CACHE);
+            cache.put(req, fresh.clone()).catch(() => {});
+          }
           return fresh;
         } catch {
-          const cache = await caches.open(SHELL_CACHE);
-          const cached = await cache.match(req);
+          const cached = await caches.match(req);
           if (cached) return cached;
+          const cache = await caches.open(SHELL_CACHE);
           const offline = await cache.match("/offline.html");
           return (
             offline ||

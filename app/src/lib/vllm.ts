@@ -11,6 +11,10 @@
 const VLLM_BASE_URL = process.env.VLLM_BASE_URL ?? "http://localhost:8100/v1";
 const VLLM_MODEL = process.env.VLLM_MODEL ?? "your-model";
 
+// Overall cap on connect + full stream. Generous — an ~800-token answer
+// finishes well inside this — but a hung backend can't pin the request open.
+const STREAM_TIMEOUT_MS = 120_000;
+
 interface ChatMessage {
   role: "system" | "user" | "assistant";
   content: string;
@@ -39,6 +43,9 @@ interface ChatStreamChunk {
  * sentinel.
  */
 export async function* streamVllmChat(opts: VllmChatStreamOpts): AsyncGenerator<string> {
+  const signals = [AbortSignal.timeout(STREAM_TIMEOUT_MS)];
+  if (opts.signal) signals.push(opts.signal);
+
   const res = await fetch(`${VLLM_BASE_URL}/chat/completions`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
@@ -49,7 +56,7 @@ export async function* streamVllmChat(opts: VllmChatStreamOpts): AsyncGenerator<
       max_tokens: opts.maxTokens ?? 1024,
       stream: true,
     }),
-    signal: opts.signal,
+    signal: AbortSignal.any(signals),
   });
 
   if (!res.ok || !res.body) {

@@ -2,14 +2,8 @@ import { getBrand } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
 
-const ACCENTS: Record<string, string> = {
-  buffy: "#c2410c",
-  vineai: "#15803d",
-};
-
 export async function GET() {
   const brand = await getBrand();
-  const accent = ACCENTS[brand.id] ?? "#c2410c";
   const iconBase = `/icon-${brand.id}`;
 
   const manifest = {
@@ -22,7 +16,7 @@ export async function GET() {
     display: "standalone",
     orientation: "portrait",
     background_color: "#1a1915",
-    theme_color: accent,
+    theme_color: brand.accent,
     categories: ["productivity", "utilities"],
     icons: [
       {

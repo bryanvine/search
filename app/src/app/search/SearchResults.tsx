@@ -6,21 +6,38 @@ import AIPanel from "@/components/AIPanel";
 import AIToggle from "@/components/AIToggle";
 import ClusterTabs from "@/components/ClusterTabs";
 import Infobox from "@/components/Infobox";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ResultsList from "@/components/ResultsList";
 import type { SearchPayload } from "@/lib/types";
 
 interface Props {
   query: string;
-  aiEnabled: boolean;
+  /** Explicit ?ai= URL override; undefined falls back to the saved preference. */
+  aiOverride?: boolean;
   debug: boolean;
 }
 
-export default function SearchResults({ query, aiEnabled, debug }: Props) {
+const AI_PREF_KEY = "ai-mode";
+
+export default function SearchResults({ query, aiOverride, debug }: Props) {
   const router = useRouter();
   const params = useSearchParams();
   const [data, setData] = useState<SearchPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeCluster, setActiveCluster] = useState<string | null>(null);
+  const [aiEnabled, setAiEnabled] = useState(aiOverride ?? false);
+
+  useEffect(() => {
+    if (aiOverride !== undefined) {
+      setAiEnabled(aiOverride);
+      return;
+    }
+    try {
+      setAiEnabled(localStorage.getItem(AI_PREF_KEY) === "1");
+    } catch {
+      /* localStorage unavailable — leave default */
+    }
+  }, [aiOverride]);
 
   useEffect(() => {
     setData(null);
@@ -42,10 +59,16 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
   }, [query, debug]);
 
   function setAI(next: boolean) {
+    setAiEnabled(next);
+    try {
+      localStorage.setItem(AI_PREF_KEY, next ? "1" : "0");
+    } catch {
+      /* localStorage unavailable — still works for this page */
+    }
     const sp = new URLSearchParams(params);
     if (next) sp.set("ai", "1");
     else sp.delete("ai");
-    router.replace(`/search?${sp.toString()}`);
+    router.replace(`/search?${sp.toString()}`, { scroll: false });
   }
 
   const filtered = useMemo(() => {
@@ -56,25 +79,19 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
 
   if (error) {
     return (
-      <p className="font-serif text-red-700 dark:text-red-400 italic py-8">
-        {error}
-      </p>
+      <div>
+        <div className="flex items-center justify-end mb-4 pb-2 border-b border-ink-200 dark:border-ink-800">
+          <AIToggle enabled={aiEnabled} onChange={setAI} />
+        </div>
+        <p className="font-serif text-red-700 dark:text-red-400 italic py-8">
+          {error}
+        </p>
+      </div>
     );
   }
 
   if (!data) {
-    return (
-      <div className="animate-pulse space-y-4 mt-8" aria-label="Searching">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="space-y-2">
-            <div className="h-3 w-1/3 bg-ink-200 dark:bg-ink-800" />
-            <div className="h-5 w-2/3 bg-ink-200 dark:bg-ink-800" />
-            <div className="h-3 w-full bg-ink-200 dark:bg-ink-800" />
-            <div className="h-3 w-5/6 bg-ink-200 dark:bg-ink-800" />
-          </div>
-        ))}
-      </div>
-    );
+    return <LoadingSkeleton />;
   }
 
   const enginesUsedDisplay = data.enginesUsed.slice(0, 8).join(" · ");
@@ -90,6 +107,14 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
             {data.cached && <span className="text-accent"> · cached</span>}
           </p>
           <AIToggle enabled={aiEnabled} onChange={setAI} />
+        </div>
+
+        {/* The right rail is hidden on phones — surface its key content inline. */}
+        <div className="md:hidden">
+          {data.answers.length > 0 && <DirectAnswer text={data.answers[0]} />}
+          {data.infoboxes && data.infoboxes.length > 0 && (
+            <Infobox infobox={data.infoboxes[0]} />
+          )}
         </div>
 
         <ClusterTabs
@@ -108,40 +133,21 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
           unresponsiveEngines={data.unresponsiveEngines}
           enginesUsedCount={data.enginesUsed.length}
         />
+
+        {data.suggestions.length > 0 && (
+          <div className="md:hidden mt-8">
+            <RelatedSuggestions suggestions={data.suggestions} />
+          </div>
+        )}
       </div>
 
       <aside className="hidden md:block">
         {data.infoboxes && data.infoboxes.length > 0 && (
           <Infobox infobox={data.infoboxes[0]} />
         )}
-        {data.answers.length > 0 && (
-          <div className="border border-ink-300 dark:border-ink-700 p-5 mb-6 bg-white/40 dark:bg-ink-800/30">
-            <h3 className="font-serif text-sm uppercase tracking-widest text-ink-600 dark:text-ink-300 mb-2">
-              Direct answer
-            </h3>
-            <p className="font-serif text-sm leading-relaxed text-ink-900 dark:text-ink-100">
-              {data.answers[0]}
-            </p>
-          </div>
-        )}
+        {data.answers.length > 0 && <DirectAnswer text={data.answers[0]} />}
         {data.suggestions.length > 0 && (
-          <div className="mb-6">
-            <h3 className="font-serif text-xs uppercase tracking-widest text-ink-600 dark:text-ink-300 mb-2">
-              Related
-            </h3>
-            <ul className="text-sm space-y-1">
-              {data.suggestions.slice(0, 6).map((s) => (
-                <li key={s}>
-                  <a
-                    href={`/search?q=${encodeURIComponent(s)}`}
-                    className="font-serif italic text-ink-700 dark:text-ink-200 hover:text-accent transition-colors"
-                  >
-                    {s}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <RelatedSuggestions suggestions={data.suggestions} />
         )}
         <div className="text-[10px] font-mono text-ink-600 dark:text-ink-300 leading-relaxed">
           <p className="mb-1 uppercase tracking-widest text-ink-500 dark:text-ink-400">engines</p>
@@ -154,6 +160,41 @@ export default function SearchResults({ query, aiEnabled, debug }: Props) {
           )}
         </div>
       </aside>
+    </div>
+  );
+}
+
+function DirectAnswer({ text }: { text: string }) {
+  return (
+    <div className="border border-ink-300 dark:border-ink-700 p-5 mb-6 bg-white/40 dark:bg-ink-800/30">
+      <h3 className="font-serif text-sm uppercase tracking-widest text-ink-600 dark:text-ink-300 mb-2">
+        Direct answer
+      </h3>
+      <p className="font-serif text-sm leading-relaxed text-ink-900 dark:text-ink-100">
+        {text}
+      </p>
+    </div>
+  );
+}
+
+function RelatedSuggestions({ suggestions }: { suggestions: string[] }) {
+  return (
+    <div className="mb-6">
+      <h3 className="font-serif text-xs uppercase tracking-widest text-ink-600 dark:text-ink-300 mb-2">
+        Related
+      </h3>
+      <ul className="text-sm space-y-1">
+        {suggestions.slice(0, 6).map((s) => (
+          <li key={s}>
+            <a
+              href={`/search?q=${encodeURIComponent(s)}`}
+              className="font-serif italic text-ink-700 dark:text-ink-200 hover:text-accent transition-colors"
+            >
+              {s}
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

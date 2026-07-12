@@ -3,14 +3,8 @@ import ServiceWorker from "@/components/ServiceWorker";
 import { getBrand } from "@/lib/brand";
 import "./globals.css";
 
-const ACCENTS: Record<string, string> = {
-  buffy: "#c2410c",
-  vineai: "#15803d",
-};
-
 export async function generateMetadata(): Promise<Metadata> {
   const brand = await getBrand();
-  const accent = ACCENTS[brand.id] ?? "#c2410c";
   const iconBase = `/icon-${brand.id}`;
 
   return {
@@ -34,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     other: {
       "mobile-web-app-capable": "yes",
-      "msapplication-TileColor": accent,
+      "msapplication-TileColor": brand.accent,
     },
     openGraph: {
       type: "website",
