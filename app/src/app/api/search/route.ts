@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cacheGet, cacheSet, searchCacheKey } from "@/lib/cache";
+import { detectorEnabled } from "@/lib/detector";
 import { rank } from "@/lib/ranking";
 import { detectIntent } from "@/lib/ranking/intent";
 import { searxngSearch } from "@/lib/searxng";
@@ -72,6 +73,7 @@ export async function GET(req: NextRequest) {
     unresponsiveEngines: (searxResp.unresponsive_engines ?? []).map((e) => (Array.isArray(e) ? e[0] : String(e))),
     tookMs: Date.now() - start,
     cached: false,
+    detectorEnabled,
   };
 
   // Cache without the (large) debug field to keep memory down

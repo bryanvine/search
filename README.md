@@ -28,12 +28,13 @@ No third-party AI APIs. No telemetry. No ads. Installable as a PWA.
    │ Next.js app  :20000                           │
    │  ├── /api/search → ranking → SearXNG          │
    │  ├── /api/answer → local vLLM (streaming SSE) │
+   │  ├── /api/detect → ai-detector (optional)     │
    │  └── UI (search, results, AI toggle, PWA)     │
    └─────┬───────────────┬───────────────┬─────────┘
          │               │               │
    ┌─────▼─────┐   ┌─────▼─────┐   ┌─────▼──────────┐
    │  SearXNG  │   │   Redis   │   │ your local     │
-   │  :20080   │   │   :20379  │   │ vLLM instance  │
+   │  :20080   │   │ internal  │   │ vLLM instance  │
    └───────────┘   └───────────┘   │ (OpenAI-compat │
                                    │  /v1 endpoint) │
                                    └────────────────┘
@@ -45,7 +46,8 @@ No third-party AI APIs. No telemetry. No ads. Installable as a PWA.
 |-------|------------------|
 | 20000 | Next.js app      |
 | 20080 | SearXNG          |
-| 20379 | Redis            |
+
+Redis is reachable only on the compose network — no host port.
 
 ## Quickstart
 
@@ -90,7 +92,26 @@ Powered entirely by **your own** vLLM instance — set `VLLM_BASE_URL` to any
 OpenAI-compatible `/v1` endpoint. No requests leave your network.
 
 The AI mode is **off by default**: standard search returns instantly without
-any LLM call.
+any LLM call. The toggle is sticky — flip it once and it stays on across
+searches (the `?ai=1`/`?ai=0` URL params remain explicit overrides for
+shareable links).
+
+## AI-content detection (optional)
+
+Every result with enough snippet text gets an `ai?` chip. Click it and the
+snippet is scored by a self-hosted
+[ai-detector](https://github.com/bryanvine/ai-detector) instance — an
+ensemble of perplexity, token-rank, stylometry, and LLM-judge signals — and
+the chip becomes a color-coded `ai NN%` verdict linking to the full
+per-signal evidence page.
+
+Checks are on demand (each uncached verdict costs the detector ~10s of
+inference), cached in Redis for a week by snippet hash, and rate-limited
+per user — the end-user IP is forwarded so the detector applies its own
+per-IP budget to people, not to this app's container.
+
+Set `DETECTOR_URL` (and optionally `DETECTOR_PUBLIC_URL` for the evidence
+links) in `.env` to enable; leave unset and the UI never shows the chips.
 
 ## Repo layout
 

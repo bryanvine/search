@@ -51,5 +51,6 @@ export async function cacheSet<T>(key: string, value: T, ttlSec = SEARCH_TTL_SEC
 }
 
 export function searchCacheKey(query: string, intent: string): string {
-  return `search:v1:${intent}:${query.toLowerCase().trim()}`;
+  // v2: payload gained detectorEnabled
+  return `search:v2:${intent}:${query.toLowerCase().trim()}`;
 }

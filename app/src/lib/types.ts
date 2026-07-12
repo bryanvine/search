@@ -83,4 +83,6 @@ export interface SearchPayload {
   enginesUsed: string[];
   unresponsiveEngines: string[];
   cached: boolean;
+  /** Whether the optional ai-detector integration is configured server-side. */
+  detectorEnabled: boolean;
 }

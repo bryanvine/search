@@ -1,9 +1,11 @@
+import DetectBadge from "./DetectBadge";
 import type { RankedResult } from "@/lib/types";
 
 interface Props {
   result: RankedResult;
   rank: number;
   showDebug?: boolean;
+  showDetect?: boolean;
 }
 
 function formatAge(days: number | null): string | null {
@@ -16,7 +18,7 @@ function formatAge(days: number | null): string | null {
   return `${Math.round(days / 365)} years ago`;
 }
 
-export default function ResultCard({ result, rank, showDebug }: Props) {
+export default function ResultCard({ result, rank, showDebug, showDetect }: Props) {
   const age = formatAge(result.ageDays);
 
   return (
@@ -36,11 +38,16 @@ export default function ResultCard({ result, rank, showDebug }: Props) {
         {age && (
           <span className="text-xs text-ink-500 dark:text-ink-400 font-sans tracking-wide">· {age}</span>
         )}
-        {result.cluster && (
-          <span className="cluster-chip ml-auto text-[10px] uppercase tracking-widest text-accent/90 border border-accent/40 px-1.5 py-0.5">
-            {result.cluster}
-          </span>
-        )}
+        <span className="ml-auto flex items-center gap-1.5 shrink-0">
+          {result.cluster && (
+            <span className="cluster-chip text-[10px] uppercase tracking-widest text-accent/90 border border-accent/40 px-1.5 py-0.5">
+              {result.cluster}
+            </span>
+          )}
+          {showDetect && (
+            <DetectBadge title={result.title} content={result.content ?? ""} />
+          )}
+        </span>
       </div>
       <h2 className="font-serif text-xl leading-snug mb-1">
         <a

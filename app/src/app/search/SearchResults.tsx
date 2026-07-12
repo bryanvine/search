@@ -130,6 +130,7 @@ export default function SearchResults({ query, aiOverride, debug }: Props) {
         <ResultsList
           results={filtered}
           showDebug={debug}
+          showDetect={data.detectorEnabled}
           unresponsiveEngines={data.unresponsiveEngines}
           enginesUsedCount={data.enginesUsed.length}
         />

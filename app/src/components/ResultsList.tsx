@@ -4,6 +4,7 @@ import type { RankedResult } from "@/lib/types";
 interface Props {
   results: RankedResult[];
   showDebug?: boolean;
+  showDetect?: boolean;
   unresponsiveEngines?: string[];
   enginesUsedCount?: number;
 }
@@ -11,6 +12,7 @@ interface Props {
 export default function ResultsList({
   results,
   showDebug,
+  showDetect,
   unresponsiveEngines = [],
   enginesUsedCount = 0,
 }: Props) {
@@ -42,7 +44,7 @@ export default function ResultsList({
     <ol className="list-none p-0 m-0">
       {results.map((r, i) => (
         <li key={r.url}>
-          <ResultCard result={r} rank={i + 1} showDebug={showDebug} />
+          <ResultCard result={r} rank={i + 1} showDebug={showDebug} showDetect={showDetect} />
         </li>
       ))}
     </ol>

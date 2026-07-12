@@ -14,6 +14,10 @@ services:
       - VLLM_BASE_URL=${VLLM_BASE_URL:-http://localhost:8100/v1}
       - VLLM_MODEL=${VLLM_MODEL:-your-model}
       - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost:20000}
+      # Optional AI-generated-content detector (ai-detector project).
+      # Leave DETECTOR_URL empty to hide the feature entirely.
+      - DETECTOR_URL=${DETECTOR_URL:-}
+      - DETECTOR_PUBLIC_URL=${DETECTOR_PUBLIC_URL:-}
     depends_on:
       searxng:
         condition: service_started
@@ -25,6 +29,8 @@ services:
     # docker host so this is a no-op for local-only setups.
     extra_hosts:
       - "${VLLM_HOSTNAME:-vllm.local}:${VLLM_HOST_IP:-host-gateway}"
+      # Lets DETECTOR_URL point at a service running on the docker host.
+      - "host.docker.internal:host-gateway"
     networks:
       - search-net
     restart: unless-stopped
