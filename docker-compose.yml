@@ -35,7 +35,7 @@ services:
         max-file: "3"
 
   searxng:
-    image: searxng/searxng:latest
+    image: searxng/searxng:latest@sha256:c5e5aedb70ec4b7ff5b1e8f8ea69253dceb85a98b8757360c1b65fe8652d6066
     container_name: search-searxng
     ports:
       - "20080:8080"
@@ -56,8 +56,6 @@ services:
   redis:
     image: redis:7-alpine
     container_name: search-redis
-    ports:
-      - "20379:6379"
     command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
     volumes:
       - redis-data:/data
