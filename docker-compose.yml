@@ -40,11 +40,38 @@ services:
         max-size: "50m"
         max-file: "3"
 
+  # Caching + pacing proxy in front of SearXNG. Several apps on this host
+  # share the instance via host port 20080; the gateway smooths their combined
+  # request rate so upstream engines stop suspending us, and caches repeat
+  # queries. SearXNG itself is compose-internal only.
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: search-gateway
+    ports:
+      - "20080:20080"
+    environment:
+      - SEARXNG_UPSTREAM=http://searxng:8080
+      - GATEWAY_RATE_PER_MIN=${GATEWAY_RATE_PER_MIN:-10}
+      - GATEWAY_BURST=${GATEWAY_BURST:-4}
+      - GATEWAY_CACHE_TTL_S=${GATEWAY_CACHE_TTL_S:-1800}
+      - GATEWAY_MAX_WAIT_S=${GATEWAY_MAX_WAIT_S:-20}
+    depends_on:
+      searxng:
+        condition: service_started
+    networks:
+      - search-net
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
   searxng:
     image: searxng/searxng:latest@sha256:c5e5aedb70ec4b7ff5b1e8f8ea69253dceb85a98b8757360c1b65fe8652d6066
     container_name: search-searxng
-    ports:
-      - "20080:8080"
     environment:
       - SEARXNG_BASE_URL=http://searxng:8080/
       - INSTANCE_NAME=${SEARXNG_INSTANCE_NAME:-search}

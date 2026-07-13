@@ -34,10 +34,13 @@ No third-party AI APIs. No telemetry. No ads. Installable as a PWA.
          │               │               │
    ┌─────▼─────┐   ┌─────▼─────┐   ┌─────▼──────────┐
    │  SearXNG  │   │   Redis   │   │ your local     │
-   │  :20080   │   │ internal  │   │ vLLM instance  │
-   └───────────┘   └───────────┘   │ (OpenAI-compat │
-                                   │  /v1 endpoint) │
-                                   └────────────────┘
+   │ internal  │   │ internal  │   │ vLLM instance  │
+   └─────▲─────┘   └───────────┘   │ (OpenAI-compat │
+         │                         │  /v1 endpoint) │
+   ┌─────┴─────┐                   └────────────────┘
+   │  gateway  │◄── other apps sharing this SearXNG
+   │  :20080   │    (cache + pacing, see below)
+   └───────────┘
 ```
 
 ## Port allocation
@@ -45,9 +48,40 @@ No third-party AI APIs. No telemetry. No ads. Installable as a PWA.
 | Port  | Service          |
 |-------|------------------|
 | 20000 | Next.js app      |
-| 20080 | SearXNG          |
+| 20080 | SearXNG gateway  |
 
-Redis is reachable only on the compose network — no host port.
+SearXNG and Redis are reachable only on the compose network — no host
+ports. Anything that wants SearXNG goes through the gateway on 20080.
+
+## SearXNG gateway (cache + pacing)
+
+Multiple apps sharing one SearXNG instance will eventually get its upstream
+engines (DuckDuckGo, Brave, Startpage, …) to suspend it — "too many
+requests", CAPTCHAs — which takes every consumer down at once. The
+`gateway/` service sits on host port 20080, exactly where consumers already
+pointed, so **no consumer needs any change**, and it:
+
+- **caches** non-empty `/search?format=json` responses for 30 min (empty
+  result sets are what suspension looks like, so they're never cached);
+- **collapses** concurrent identical queries into one upstream fetch;
+- **paces** what actually reaches the engines with a token bucket
+  (`GATEWAY_RATE_PER_MIN`, default 10/min, burst `GATEWAY_BURST`=4),
+  queueing excess up to `GATEWAY_MAX_WAIT_S` with round-robin fairness
+  across client IPs so one chatty app can't starve the rest;
+- **serves stale** (up to 24 h) when the upstream returns empty mid-outage —
+  an old real answer beats a fresh empty one;
+- exposes counters per client at `/gateway/stats` and health at
+  `/gateway/health`.
+
+Docker's userland proxy masquerades all published-port traffic to one
+source IP, so consumers look identical by default. Apps that send an
+`X-App-Id: <name>` header get their own fairness bucket and their own line
+in `/gateway/stats` — a one-line change in each consumer, worth making but
+not required.
+
+The Next.js app itself talks to SearXNG directly on the compose network —
+interactive searches are human-paced and shouldn't queue behind background
+bots; it has its own Redis result cache besides.
 
 ## Quickstart
 
