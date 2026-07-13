@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cacheGet, cacheSet, searchCacheKey } from "@/lib/cache";
 import { detectorEnabled } from "@/lib/detector";
+import { clientIp } from "@/lib/guard";
 import { rank } from "@/lib/ranking";
 import { detectIntent } from "@/lib/ranking/intent";
 import { searxngSearch } from "@/lib/searxng";
@@ -40,6 +41,9 @@ export async function GET(req: NextRequest) {
       language: "en",
       timeRange: intent === "news" ? "month" : "",
       signal: req.signal,
+      // Per-end-client fairness at the gateway: a scraper hammering this API
+      // gets its own queue bucket and can't starve interactive searches.
+      appId: `app:${clientIp(req)}`,
     });
   } catch (err) {
     return NextResponse.json(

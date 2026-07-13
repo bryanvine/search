@@ -26,7 +26,9 @@ function getClient(): Redis | null {
   return client;
 }
 
-const SEARCH_TTL_SECONDS = 60 * 30; // 30 min
+// Bot consumers of /api/search repeat identical queries every cycle; each
+// cache hit here is one less query the engines ever see.
+const SEARCH_TTL_SECONDS = Number(process.env.SEARCH_CACHE_TTL_S ?? 3600);
 
 export async function cacheGet<T>(key: string): Promise<T | null> {
   const c = getClient();

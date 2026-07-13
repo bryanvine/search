@@ -9,7 +9,10 @@ services:
     environment:
       - PORT=20000
       - NODE_ENV=production
-      - SEARXNG_URL=http://searxng:8080
+      # Through the gateway (pacing + shared cache) — scrapers hit this app's
+      # /api/search too, so the direct path would dodge the pacing.
+      - SEARXNG_URL=${SEARXNG_URL:-http://gateway:20080}
+      - SEARCH_CACHE_TTL_S=${SEARCH_CACHE_TTL_S:-3600}
       - REDIS_URL=redis://redis:6379
       - VLLM_BASE_URL=${VLLM_BASE_URL:-http://localhost:8100/v1}
       - VLLM_MODEL=${VLLM_MODEL:-your-model}
@@ -19,6 +22,8 @@ services:
       - DETECTOR_URL=${DETECTOR_URL:-}
       - DETECTOR_PUBLIC_URL=${DETECTOR_PUBLIC_URL:-}
     depends_on:
+      gateway:
+        condition: service_started
       searxng:
         condition: service_started
       redis:

@@ -33,13 +33,14 @@ No third-party AI APIs. No telemetry. No ads. Installable as a PWA.
    └─────┬───────────────┬───────────────┬─────────┘
          │               │               │
    ┌─────▼─────┐   ┌─────▼─────┐   ┌─────▼──────────┐
-   │  SearXNG  │   │   Redis   │   │ your local     │
-   │ internal  │   │ internal  │   │ vLLM instance  │
-   └─────▲─────┘   └───────────┘   │ (OpenAI-compat │
-         │                         │  /v1 endpoint) │
-   ┌─────┴─────┐                   └────────────────┘
-   │  gateway  │◄── other apps sharing this SearXNG
-   │  :20080   │    (cache + pacing, see below)
+   │  gateway  │   │   Redis   │   │ your local     │
+   │  :20080   │   │ internal  │   │ vLLM instance  │
+   └─────┬─────┘   └───────────┘   │ (OpenAI-compat │
+         │  ▲                      │  /v1 endpoint) │
+         │  └─ other apps sharing  └────────────────┘
+   ┌─────▼─────┐   this SearXNG
+   │  SearXNG  │   (cache + pacing, see below)
+   │ internal  │
    └───────────┘
 ```
 
@@ -79,9 +80,13 @@ source IP, so consumers look identical by default. Apps that send an
 in `/gateway/stats` — a one-line change in each consumer, worth making but
 not required.
 
-The Next.js app itself talks to SearXNG directly on the compose network —
-interactive searches are human-paced and shouldn't queue behind background
-bots; it has its own Redis result cache besides.
+The Next.js app routes through the gateway too — scrapers use this app's
+`/api/search` (ranked results) just as much as raw SearXNG, so a direct
+path would dodge the pacing. The app forwards each end client's IP as its
+`X-App-Id`, so every API consumer gets its own fairness bucket and an
+interactive search never queues behind a scraper's burst. The app's own
+Redis payload cache (`SEARCH_CACHE_TTL_S`, default 1 h) sits in front of
+all of it.
 
 ## Quickstart
 
