@@ -8,7 +8,7 @@ general:
 
 search:
   safe_search: 0
-  autocomplete: "duckduckgo"
+  autocomplete: "startpage"
   default_lang: "en"
   formats:
     - html
@@ -55,7 +55,12 @@ engines:
     timeout: 6.0
   - name: bing
     timeout: 6.0
+  # 2026-07-14: DDG network-blocked this IP (ConnectTimeout before any HTTP
+  # exchange) — every search burned the full 6s waiting on it and re-suspended
+  # it, ~1200 suspension log lines/day. Re-enable later to test if the block
+  # has expired.
   - name: duckduckgo
+    disabled: true
     timeout: 6.0
   - name: brave
     timeout: 6.0

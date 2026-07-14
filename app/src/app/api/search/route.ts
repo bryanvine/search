@@ -80,8 +80,10 @@ export async function GET(req: NextRequest) {
     detectorEnabled,
   };
 
-  // Cache without the (large) debug field to keep memory down
-  if (!debug && !noCache) {
+  // Cache without the (large) debug field to keep memory down. Empty result
+  // sets are what engine suspension looks like — never cache them, or bots
+  // stay pinned to a bad answer for the whole TTL after engines recover.
+  if (!debug && !noCache && results.length > 0) {
     void cacheSet(cacheKey, payload);
   }
 

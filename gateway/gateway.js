@@ -37,7 +37,9 @@ const MAX_QUEUED = Number(process.env.GATEWAY_MAX_QUEUED ?? 100);
 const CACHE_TTL_MS = Number(process.env.GATEWAY_CACHE_TTL_S ?? 1800) * 1000;
 // Stale entries stay usable this long as a fallback during engine outages.
 const STALE_TTL_MS = Number(process.env.GATEWAY_STALE_TTL_S ?? 24 * 3600) * 1000;
-const CACHE_MAX_ENTRIES = Number(process.env.GATEWAY_CACHE_MAX ?? 500);
+// ~60KB per SearXNG JSON payload → ~120MB worst case. 500 proved too small:
+// a day of bot traffic pinned the cache at the cap and LRU-churned it.
+const CACHE_MAX_ENTRIES = Number(process.env.GATEWAY_CACHE_MAX ?? 2000);
 
 const UPSTREAM_TIMEOUT_MS = 25_000;
 
